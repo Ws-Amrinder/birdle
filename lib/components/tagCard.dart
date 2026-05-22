@@ -1,0 +1,64 @@
+import 'package:flutter/material.dart';
+
+class TagCard extends StatelessWidget {
+  final String tag;
+  final Color? color;
+  final Color? foregroundColor;
+  final Function()? onPressed;
+  final String id;
+  final String selectedTagId;
+  final Function(String id)? onTagPressed;
+
+  TagCard({
+    required this.tag,
+    this.color,
+    this.foregroundColor,
+    this.onPressed,
+    required this.id,
+    required this.selectedTagId,
+    this.onTagPressed,
+  });
+
+  late Color clr = color ?? Color(0xFFD3D3D3);
+  late HSLColor hsl = HSLColor.fromColor(clr);
+  late double newLightness = (hsl.lightness + 0.3).clamp(0.0, 1.0);
+  late Color newColor = hsl.withLightness(newLightness).toColor();
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      key: Key(id),
+      onPressed: () {
+        onTagPressed?.call(id);
+      },
+      style: TextButton.styleFrom(padding: EdgeInsets.symmetric(horizontal: 6)),
+      child: Container(
+        decoration: BoxDecoration(
+          color: color != null
+              ? newColor
+              : selectedTagId == id
+              ? color ?? Color(0xFF2C2C2A)
+              : Color(0xFFFFFFFF),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selectedTagId == id
+                ? color ?? Color(0xFF2C2C2A)
+                : color != null ? Colors.transparent : Color(0xFF888780),
+          ),
+        ),
+        // alignment: Alignment.centerLeft,
+        padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        child: Text(
+          tag,
+          style: TextStyle(
+            color: color != null
+                ? color
+                : selectedTagId == id
+                ? Colors.white
+                : Color(0xFF2C2C2A),
+          ),
+        ),
+      ),
+    );
+  }
+}
