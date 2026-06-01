@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class TagCard extends StatelessWidget {
   final String tag;
   final Color? color;
-  final Color? foregroundColor;
   final Function()? onPressed;
   final String id;
   final String selectedTagId;
@@ -12,7 +11,6 @@ class TagCard extends StatelessWidget {
   TagCard({
     required this.tag,
     this.color,
-    this.foregroundColor,
     this.onPressed,
     required this.id,
     required this.selectedTagId,
@@ -33,6 +31,7 @@ class TagCard extends StatelessWidget {
       },
       style: TextButton.styleFrom(padding: EdgeInsets.symmetric(horizontal: 6)),
       child: Container(
+        key: UniqueKey(),
         decoration: BoxDecoration(
           color: color != null
               ? newColor
@@ -43,7 +42,9 @@ class TagCard extends StatelessWidget {
           border: Border.all(
             color: selectedTagId == id
                 ? color ?? Color(0xFF2C2C2A)
-                : color != null ? Colors.transparent : Color(0xFF888780),
+                : color != null
+                ? Colors.transparent
+                : Color(0xFF888780),
           ),
         ),
         // alignment: Alignment.centerLeft,

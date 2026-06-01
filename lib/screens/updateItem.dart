@@ -1,116 +1,120 @@
+import 'package:birdle/components/commons/confirmDialog.dart';
 import 'package:birdle/components/commons/datePicker.dart';
 import 'package:birdle/components/commons/timePicker.dart';
-import 'package:birdle/providers/taskProvider.dart';
-import 'package:flutter/material.dart';
 import 'package:birdle/components/tagCard.dart';
-import 'package:uuid/uuid.dart';
 import 'package:birdle/task_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:birdle/components/taskItem.dart';
+import 'package:birdle/providers/taskProvider.dart';
 import 'package:provider/provider.dart';
 
-class Task {
-  final String taskName;
-  final String taskDescription;
+class UpdateItem extends StatefulWidget {
+  final Map<String, dynamic> entry;
   final String taskDate;
-  final String taskTime;
-  final String taskCategory;
-  final String taskPriority;
-  final String taskId;
+  const UpdateItem({required this.entry, required this.taskDate});
 
-  Task({
-    required this.taskName,
-    required this.taskDescription,
-    required this.taskDate,
-    required this.taskTime,
-    required this.taskCategory,
-    required this.taskPriority,
-    required this.taskId,
-  });
-}
-
-class AddTaskDrawer extends StatefulWidget {
   @override
-  State<AddTaskDrawer> createState() => _AddTaskDrawerState();
+  State<UpdateItem> createState() => _UpdateItemState();
 }
 
-class _AddTaskDrawerState extends State<AddTaskDrawer> {
-  String selectedCategoryId = "work";
-  String selectedPriorityId = "low";
-
-  // final asyncPrefs = await SharedPreferencesAsync();
-  List<String> savedTasks = [];
-  final uuid = Uuid();
-
-  final taskNameController = TextEditingController();
-  final taskDescriptionController = TextEditingController();
-  final taskDateController = TextEditingController();
-  final taskTimeController = TextEditingController();
+class _UpdateItemState extends State<UpdateItem> {
+  final updateNameController = TextEditingController(text: '');
+  final updateDescriptionController = TextEditingController(text: '');
+  final updateDateController = TextEditingController(text: '');
+  final updateTimeController = TextEditingController(text: '');
   final formKey = GlobalKey<FormState>();
 
   @override
-  void dispose() {
-    // Clean up the controller when the widget is disposed.
-    taskNameController.dispose();
-    taskDescriptionController.dispose();
-    taskDateController.dispose();
-    taskTimeController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    updateNameController.text = widget.entry['taskName'] ?? '';
+    updateDescriptionController.text = widget.entry['taskDescription'] ?? '';
+    updateDateController.text = widget.entry['taskDate'] ?? '';
+    updateTimeController.text = widget.entry['taskTime'] ?? '';
   }
 
-  submitForm(BuildContext context, Map<String, String> taskMap) async {
+  @override
+  void dispose() {
+    super.dispose();
+    updateNameController.dispose();
+    updateDescriptionController.dispose();
+    updateDateController.dispose();
+    updateTimeController.dispose();
+  }
+
+  submitForm(BuildContext context) async {
     if (formKey.currentState!.validate()) {
       print('Form is valid');
-      bool success = await saveTask(taskMap);
-      print("success add task response ----------------------: ${success} -----------------------------");
-      if (success) {
-        Navigator.pop(context);
-        context.read<TaskNotifier>().resetSelectedTaskId();
-        context.read<TaskNotifier>().resetSelectedCategoryId();
-        context.read<TaskNotifier>().resetSelectedPriorityId();
-      }
+      final updatedEntry = {
+        ...widget.entry,
+        "taskName": updateNameController.text,
+        "taskDescription": updateDescriptionController.text,
+        "taskDate": updateDateController.text,
+        "taskTime": updateTimeController.text,
+        "taskCategory": context.read<TaskNotifier>().getSelectedCategoryId(),
+        "taskPriority": context.read<TaskNotifier>().getSelectedPriorityId(),
+      };
+      await updateTask(updatedEntry, widget.taskDate);
+      Navigator.pop(context, true);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // final String uniqueId = uuid.v4();
-    final taskNameVal = taskNameController.text;
-    final taskDescVal = taskDescriptionController.text;
-    final taskDateVal = taskDateController.text;
-    final taskTimeVal = taskTimeController.text;
+    String tappedId = Provider.of<TaskNotifier>(context).getSelectedTaskId();
 
-    dynamic taskMap = {
-      "taskName": taskNameVal,
-      "taskDescription": taskDescVal,
-      "taskDate": taskDateVal,
-      "taskTime": taskTimeVal,
-      "taskCategory": Provider.of<TaskNotifier>(
-        context,
-      ).getSelectedCategoryId(),
-      "taskPriority": Provider.of<TaskNotifier>(
-        context,
-      ).getSelectedPriorityId(),
-      "taskId": uuid.v1(),
-      "status": "active",
-      "taskCreatedAt": DateTime.now().toIso8601String(),
-    };
+    final updateNameVal = updateNameController.text;
+    final updateDescVal = updateDescriptionController.text;
+    final updateDateVal = updateDateController.text;
+    final updateTimeVal = updateTimeController.text;
 
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: SafeArea(
-        minimum: EdgeInsets.only(left: 20, right: 20, top: 30, bottom: 30),
+    return Scaffold(
+      body: SafeArea(
+        minimum: EdgeInsets.only(left: 20, right: 20, top: 60, bottom: 30),
+        child: SingleChildScrollView(child: Container(
+          alignment: Alignment.centerLeft,
 
-        child: SingleChildScrollView(
           child: Form(
             key: formKey,
             child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10),
-                  child: Text('Add Task', style: TextStyle(fontSize: 24)),
+              children: [
+                // header
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Centered text
+                    Text(
+                      "Edit Task",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    // Back button aligned to the left
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min, // shrink to fit
+                          children: [
+                            Icon(Icons.arrow_back, color: Color(0xFF2C2C2A)),
+                            Text(
+                              'Back',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Color(0xFF2C2C2A),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
 
                 Padding(
@@ -119,18 +123,15 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text("Task Name"),
-                      // TextField(decoration: InputDecoration(
-                      //   hintText: 'Enter Task Name',
-                      // ))
                       TextFormField(
                         maxLength: 20,
+                        controller: updateNameController,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Task Name is required';
                           }
                           return null;
                         },
-                        controller: taskNameController,
                         decoration: InputDecoration(
                           filled: true, // Required for fillColor to take effect
                           fillColor: Colors.white,
@@ -148,6 +149,7 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                             ),
                             borderRadius: BorderRadius.circular(12),
                           ),
+
                           hintText: 'Enter Task Name',
                         ),
                       ),
@@ -162,15 +164,14 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                     children: [
                       Text("Task Description"),
                       TextFormField(
+                        maxLines: 4,
+                        controller: updateDescriptionController,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Task Description is required';
                           }
                           return null;
                         },
-
-                        maxLines: 4,
-                        controller: taskDescriptionController,
                         decoration: InputDecoration(
                           filled: true, // Required for fillColor to take effect
                           fillColor: Colors.white,
@@ -204,8 +205,9 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                       Row(
                         children: [
                           Expanded(
-                            child: DatePicker(
-                              controller: taskDateController,
+                            child: 
+                            DatePicker(
+                              controller: updateDateController,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Date is required';
@@ -215,10 +217,10 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                             ),
                           ),
                           SizedBox(width: 10),
-
                           Expanded(
-                            child: TimePicker(
-                              controller: taskTimeController,
+                            child: 
+                            TimePicker(
+                              controller: updateTimeController,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Time is required';
@@ -248,11 +250,13 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                                 TagCard(
                                   tag: "Work",
                                   id: "work",
-
                                   selectedTagId: context
                                       .read<TaskNotifier>()
                                       .getSelectedCategoryId(),
                                   onTagPressed: (id) {
+                                    // setState(() {
+                                    //   selectedCategoryId = id;
+                                    // });
                                     context
                                         .read<TaskNotifier>()
                                         .setSelectedCategoryId(id);
@@ -265,6 +269,9 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                                       .read<TaskNotifier>()
                                       .getSelectedCategoryId(),
                                   onTagPressed: (id) {
+                                    // setState(() {
+                                    //   selectedCategoryId = id;
+                                    // });
                                     context
                                         .read<TaskNotifier>()
                                         .setSelectedCategoryId(id);
@@ -277,6 +284,9 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                                       .read<TaskNotifier>()
                                       .getSelectedCategoryId(),
                                   onTagPressed: (id) {
+                                    // setState(() {
+                                    //   selectedCategoryId = id;
+                                    // });
                                     context
                                         .read<TaskNotifier>()
                                         .setSelectedCategoryId(id);
@@ -309,6 +319,9 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                                       .read<TaskNotifier>()
                                       .getSelectedPriorityId(),
                                   onTagPressed: (id) {
+                                    // setState(() {
+                                    //   selectedPriorityId = id;
+                                    // });
                                     context
                                         .read<TaskNotifier>()
                                         .setSelectedPriorityId(id);
@@ -327,6 +340,9 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                                       .read<TaskNotifier>()
                                       .getSelectedPriorityId(),
                                   onTagPressed: (id) {
+                                    // setState(() {
+                                    //   selectedPriorityId = id;
+                                    // });
                                     context
                                         .read<TaskNotifier>()
                                         .setSelectedPriorityId(id);
@@ -340,6 +356,9 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                                       .read<TaskNotifier>()
                                       .getSelectedPriorityId(),
                                   onTagPressed: (id) {
+                                    // setState(() {
+                                    //   selectedPriorityId = id;
+                                    // });
                                     context
                                         .read<TaskNotifier>()
                                         .setSelectedPriorityId(id);
@@ -358,7 +377,8 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                   padding: EdgeInsets.symmetric(vertical: 10),
                   child: TextButton(
                     onPressed: () async {
-                      submitForm(context, taskMap);
+                      submitForm(context);
+                      // Navigator.pop(context);
                     },
                     style: ButtonStyle(
                       backgroundColor: WidgetStateProperty.all(Colors.black),
@@ -369,7 +389,7 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                         padding: EdgeInsets.symmetric(vertical: 10),
                         child: Center(
                           child: Text(
-                            "Add Task",
+                            "Save Changes",
                             style: TextStyle(color: Colors.white, fontSize: 16),
                           ),
                         ),
@@ -380,7 +400,8 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
               ],
             ),
           ),
-      )),
+        )),
+      ),
     );
   }
 }
