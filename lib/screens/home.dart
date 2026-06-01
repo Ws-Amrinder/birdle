@@ -129,16 +129,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Align(
                       alignment: Alignment.centerLeft,
-                      child: Text('My Tasks', style: TextStyle(fontSize: 24)),
+                      child: Text('My Tasks', style: Theme.of(context).textTheme.headlineLarge),
                     ),
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         '19 May 2026',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF888780),
-                        ),
+                        style: Theme.of(context).textTheme?.bodyMedium,
                       ),
                     ),
 

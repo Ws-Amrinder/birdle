@@ -1,3 +1,4 @@
+import 'package:birdle/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:birdle/components/addTaskDrawer.dart';
 import 'package:birdle/components/helpers/tasks.dart';
@@ -80,7 +81,7 @@ class TaskItem extends StatelessWidget {
                               ? Icons.check_circle
                               : Icons.circle_outlined,
                           color: tappedId == id ? Colors.green : Colors.grey,
-                          size: isLargeView ? 40 : 30,
+                          size: isLargeView ? 34 : 30,
                         ),
                         SizedBox(width: 10),
                         Column(
@@ -88,16 +89,16 @@ class TaskItem extends StatelessWidget {
                           children: [
                             Text(
                               title,
-                              style: TextStyle(
-                                fontSize: isLargeView ? 26 : 16,
-                                color: status == "done"
-                                    ? Color(0xFF888780)
-                                    : Colors.black,
-                                decoration: status == "done"
-                                    ? TextDecoration.lineThrough
-                                    : TextDecoration.none,
-                                decorationColor: Color(0xFF888780),
-                              ),
+                              style: Theme.of(context).textTheme.headlineMedium
+                                  ?.copyWith(
+                                    color: status == "done"
+                                        ? Color(0xFF888780)
+                                        : Colors.black,
+                                    decoration: status == "done"
+                                        ? TextDecoration.lineThrough
+                                        : TextDecoration.none,
+                                    decorationColor: Color(0xFF888780),
+                                  ),
                             ),
 
                             if (description.isNotEmpty)
@@ -108,10 +109,7 @@ class TaskItem extends StatelessWidget {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   softWrap: false,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: Color(0xFF888780),
-                                  ),
+                                  style: Theme.of(context).textTheme.bodySmall,
                                 ),
                               ),
 
@@ -134,13 +132,14 @@ class TaskItem extends StatelessWidget {
                                     ),
                                     child: Text(
                                       category,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        color: TaskHelper.getCategoryColor(
-                                          category,
-                                        ),
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: TaskHelper.getCategoryColor(
+                                              category,
+                                            ),
+                                          ),
                                     ),
                                   ),
                                 ),
@@ -160,11 +159,10 @@ class TaskItem extends StatelessWidget {
                                     ),
                                     child: Text(
                                       priority,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        color: clr,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(color: clr),
                                     ),
                                   ),
                                 ),
@@ -173,20 +171,18 @@ class TaskItem extends StatelessWidget {
                                 if (date.isNotEmpty)
                                   Text(
                                     date,
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: Color(0xFF888780),
-                                    ),
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall,
                                   ),
                                 SizedBox(width: 10),
 
                                 if (time.isNotEmpty)
                                   Text(
                                     time,
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: Color(0xFF888780),
-                                    ),
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall,
                                   ),
                               ],
                             ),

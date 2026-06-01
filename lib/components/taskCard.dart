@@ -22,7 +22,21 @@ class TaskCard extends StatelessWidget {
       width: myWidth,
       child: Padding(
         padding: EdgeInsets.all(10),
-        child: Column(children: [Align(alignment: Alignment.centerLeft, child: Text(title, style: TextStyle(fontSize: 24))), Align(alignment: Alignment.centerLeft, child: Text(description, style: TextStyle(fontSize: 16, color: Color(0xFF888780))))]),
+        child: Column(
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(title, style: Theme.of(context).textTheme?.headlineLarge),
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                description,
+                style: Theme.of(context).textTheme?.bodyMedium,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -110,7 +110,7 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 10),
-                  child: Text('Add Task', style: TextStyle(fontSize: 24)),
+                  child: Text('Add Task', style: Theme.of(context).textTheme.headlineLarge),
                 ),
 
                 Padding(

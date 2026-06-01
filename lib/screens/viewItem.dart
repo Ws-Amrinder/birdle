@@ -78,10 +78,8 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                           Icon(Icons.arrow_back, color: Color(0xFF2C2C2A)),
                           Text(
                             'Back',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFF2C2C2A),
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: Color(0xFF2C2C2A)),
                           ),
                         ],
                       ),
@@ -97,8 +95,10 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      UpdateItem(entry: itemData, taskDate: widget.taskDate),
+                                  builder: (context) => UpdateItem(
+                                    entry: itemData,
+                                    taskDate: widget.taskDate,
+                                  ),
                                 ),
                               ).then((updated) {
                                 if (updated == true) _loadTasks();
@@ -125,7 +125,6 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                               'Delete Task',
                               'Are you sure you want to delete this task?',
                               () async {
-                                print('Delete Task');
                                 final result = await deleteTask(
                                   itemData["taskId"],
                                   widget.taskDate,
@@ -185,11 +184,11 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                           ),
                           Text(
                             "Task Completed!",
-                            style: TextStyle(
-                              color: Color(0xFF3B6D11),
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: Color(0xFF3B6D11),
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
                           Text(
                             "Done today at 9:12 AM",
@@ -248,9 +247,15 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
 
                           Row(
                             children: [
-                              Text(itemData["taskDate"] ?? ""),
+                              Text(
+                                itemData["taskDate"] ?? "",
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
                               SizedBox(width: 10),
-                              Text(itemData["taskTime"] ?? ""),
+                              Text(
+                                itemData["taskTime"] ?? "",
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
                             ],
                           ),
                         ],
@@ -285,7 +290,14 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                             ],
                           ),
 
-                          Text(itemData["taskCategory"] ?? ""),
+                          Row(
+                            children: [
+                              Text(
+                                itemData["taskCategory"] ?? "",
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
@@ -340,7 +352,17 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                         crossAxisAlignment: CrossAxisAlignment.start,
 
                         children: [
-                          Text("Notes"),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.note_add_outlined,
+                                color: Color(0xFF2C2C2A),
+                                size: 20,
+                              ),
+                              SizedBox(width: 15),
+                              Text("Notes"),
+                            ],
+                          ),
 
                           Padding(
                             padding: EdgeInsets.symmetric(vertical: 5),
@@ -348,10 +370,7 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                               alignment: Alignment.centerLeft,
                               child: Text(
                                 itemData["taskDescription"] ?? "",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Color(0xFF888780),
-                                ),
+                                style: Theme.of(context).textTheme.bodyMedium,
                               ),
                             ),
                           ),
@@ -364,39 +383,38 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                 if (itemData["status"] != "done")
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 10),
-                    child: SizedBox(width: double.infinity, child: FloatingActionButton(
-                      onPressed: () async {
-                        final updatedEntry = {
-                          ...itemData,
-                          "status": "done",
-                          "updatedAt": DateTime.now().toIso8601String(),
-                        };
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: FloatingActionButton(
+                        onPressed: () async {
+                          final updatedEntry = {
+                            ...itemData,
+                            "status": "done",
+                            "updatedAt": DateTime.now().toIso8601String(),
+                          };
 
-                        await updateTask(updatedEntry, widget.taskDate);
-                        _loadTasks();
-                        // Navigator.pop(context);
-                      },
-                      backgroundColor: Colors.black,
-                      
-                      // style: ButtonStyle(
-                      //   backgroundColor: WidgetStateProperty.all(Colors.black),
-                      // ),
-                      child: SizedBox(
-                        // width: double.infinity,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          child: Center(
-                            child: Text(
-                              "Mark as done",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
+                          await updateTask(updatedEntry, widget.taskDate);
+                          _loadTasks();
+                          // Navigator.pop(context);
+                        },
+                        backgroundColor: Colors.black,
+                        child: SizedBox(
+                          // width: double.infinity,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 10),
+                            child: Center(
+                              child: Text(
+                                "Mark as done",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    )),
+                    ),
                   ),
               ],
             ),
