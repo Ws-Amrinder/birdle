@@ -1,3 +1,4 @@
+import 'package:birdle/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class DatePicker extends StatefulWidget {
@@ -60,19 +61,7 @@ class _DatePickerState extends State<DatePicker> {
       onTap: _selectDate,
       controller: widget.controller,
       validator: widget.validator,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.white,
-        enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Color(0xFFD3D1C7), width: 1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Color(0xFFD3D1C7), width: 2),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        hintText: widget.hintText,
-      ),
+      decoration: TAppTheme.fieldDecoration(hintText: widget.hintText),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:birdle/utils/theme/theme.dart';
 import 'package:birdle/components/commons/confirmDialog.dart';
 import 'package:birdle/components/commons/datePicker.dart';
 import 'package:birdle/components/commons/timePicker.dart';
@@ -132,24 +133,7 @@ class _UpdateItemState extends State<UpdateItem> {
                           }
                           return null;
                         },
-                        decoration: InputDecoration(
-                          filled: true, // Required for fillColor to take effect
-                          fillColor: Colors.white,
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color(0xFFD3D1C7),
-                              width: 1,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color(0xFFD3D1C7),
-                              width: 2,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-
+                        decoration: TAppTheme.fieldDecoration(
                           hintText: 'Enter Task Name',
                         ),
                       ),
@@ -172,24 +156,7 @@ class _UpdateItemState extends State<UpdateItem> {
                           }
                           return null;
                         },
-                        decoration: InputDecoration(
-                          filled: true, // Required for fillColor to take effect
-                          fillColor: Colors.white,
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color(0xFFD3D1C7),
-                              width: 1,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color(0xFFD3D1C7),
-                              width: 2,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-
+                        decoration: TAppTheme.fieldDecoration(
                           hintText: 'Enter Task Description',
                         ),
                       ),

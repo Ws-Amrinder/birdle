@@ -1,4 +1,5 @@
 import 'package:birdle/components/commons/datePicker.dart';
+import 'package:birdle/utils/theme/theme.dart';
 import 'package:birdle/components/commons/timePicker.dart';
 import 'package:birdle/providers/taskProvider.dart';
 import 'package:flutter/material.dart';
@@ -119,9 +120,6 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text("Task Name"),
-                      // TextField(decoration: InputDecoration(
-                      //   hintText: 'Enter Task Name',
-                      // ))
                       TextFormField(
                         maxLength: 20,
                         validator: (value) {
@@ -131,23 +129,7 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                           return null;
                         },
                         controller: taskNameController,
-                        decoration: InputDecoration(
-                          filled: true, // Required for fillColor to take effect
-                          fillColor: Colors.white,
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color(0xFFD3D1C7),
-                              width: 1,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color(0xFFD3D1C7),
-                              width: 2,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                        decoration: TAppTheme.fieldDecoration(
                           hintText: 'Enter Task Name',
                         ),
                       ),
@@ -171,24 +153,7 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
 
                         maxLines: 4,
                         controller: taskDescriptionController,
-                        decoration: InputDecoration(
-                          filled: true, // Required for fillColor to take effect
-                          fillColor: Colors.white,
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color(0xFFD3D1C7),
-                              width: 1,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color(0xFFD3D1C7),
-                              width: 2,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-
+                        decoration: TAppTheme.fieldDecoration(
                           hintText: 'Enter Task Description',
                         ),
                       ),
