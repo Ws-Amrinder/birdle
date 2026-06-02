@@ -1,4 +1,8 @@
+import 'package:birdle/providers/themeProvider.dart';
+import 'package:birdle/utils/constants/colors.dart';
+import 'package:birdle/utils/theme/customThemes/buttonTheme.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 Future<void> confirmDialog(
   BuildContext context,
@@ -9,12 +13,12 @@ Future<void> confirmDialog(
 ) {
   double width = MediaQuery.of(context).size.width;
   double buttonWidth = width * 0.25;
-
+  final appTheme = Provider.of<ThemeNotifier>(context).getTheme();
   return showDialog<void>(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        backgroundColor: const Color(0xFFF5F3EE),
+        backgroundColor: TColors.background(appTheme),
         title: Text(title),
         content: Text(content),
         actions: <Widget>[
@@ -27,12 +31,7 @@ Future<void> confirmDialog(
                   onPressed: () async {
                     Navigator.pop(context);
                   },
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all(Colors.white),
-                    side: WidgetStateProperty.all(
-                      BorderSide(color: Color(0xFFD3D1C7)),
-                    ),
-                  ),
+                  style: TButtonTheme.secondaryTextButton(appTheme),
                   child: SizedBox(
                     width: buttonWidth,
                     child: Padding(
@@ -40,7 +39,10 @@ Future<void> confirmDialog(
                       child: Center(
                         child: Text(
                           "Cancel",
-                          style: TextStyle(color: Colors.black, fontSize: 16),
+                          style: TextStyle(
+                            color: TColors.text(appTheme),
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ),
@@ -54,9 +56,7 @@ Future<void> confirmDialog(
                     onOk();
                     Navigator.pop(context);
                   },
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all(Colors.black),
-                  ),
+                  style: TButtonTheme.primaryTextButton(appTheme),
                   child: SizedBox(
                     width: buttonWidth,
                     child: Padding(
@@ -64,7 +64,10 @@ Future<void> confirmDialog(
                       child: Center(
                         child: Text(
                           "OK",
-                          style: TextStyle(color: Colors.white, fontSize: 16),
+                          style: TextStyle(
+                            color: TColors.white(appTheme),
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ),

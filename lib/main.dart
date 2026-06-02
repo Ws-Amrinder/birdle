@@ -3,12 +3,16 @@ import 'package:birdle/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/taskProvider.dart';
+import 'providers/themeProvider.dart';
 
 void main() {
   // run app takes a widget and runs it. so MainApp is the root widget here.
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => TaskNotifier(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => TaskNotifier()),
+        ChangeNotifierProvider(create: (context) => ThemeNotifier()),
+      ],
       child: const MainApp(),
     ),
   );
@@ -19,17 +23,14 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final theme = themeNotifier.getTheme();
+    final themeMode = theme == 'light' ? ThemeMode.light : ThemeMode.dark;
+
     return MaterialApp(
-      //
       theme: TAppTheme.lightTheme,
       darkTheme: TAppTheme.darkTheme,
-      themeMode: ThemeMode.light,
-      // home: Scaffold(
-      //   body: Padding(
-      //     padding: EdgeInsets.only(left: 20, right: 20, top: 80, bottom: 30),
-      //     child: Center(child: HomeScreen()),
-      //   ),
-      // ),
+      themeMode: themeMode,
       home: SplashScreen(),
     );
   }

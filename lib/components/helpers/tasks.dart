@@ -1,27 +1,28 @@
+import 'package:birdle/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
 
 class TaskHelper {
-  static Color getPriorityColor(String priority) {
+  static Color getPriorityColor(String priority, String appTheme) {
     switch (priority) {
       case "low":
-        return Colors.green;
+        return TColors.success;
       case "medium":
-        return Color.fromARGB(255, 238, 165, 56);
+        return TColors.warning;
       case "high":
-        return Colors.red;
+        return TColors.danger;
       default:
-        return Color(0xFF000000);
+        return TColors.text(appTheme);
     }
   }
 
   static Color getCategoryColor(String category) {
     switch (category) {
       case "work":
-        return Colors.blue;
+        return TColors.blue;
       case "personal":
-        return Colors.pink;
+        return TColors.pink;
       default:
-        return Colors.purple;
+        return TColors.purple;
     }
   }
 }

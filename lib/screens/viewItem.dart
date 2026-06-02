@@ -1,11 +1,14 @@
 import 'package:birdle/components/commons/confirmDialog.dart';
-import 'package:birdle/screens/home.dart';
+import 'package:birdle/providers/themeProvider.dart';
 import 'package:birdle/screens/updateItem.dart';
+import 'package:birdle/storage/task_storage.dart';
+import 'package:birdle/utils/constants/colors.dart';
+import 'package:birdle/utils/theme/customThemes/buttonTheme.dart';
 import 'package:flutter/material.dart';
 import 'package:birdle/components/taskItem.dart';
 import 'package:birdle/providers/taskProvider.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:birdle/task_storage.dart';
 
 class ViewUpdateItem extends StatefulWidget {
   final Map<String, dynamic> entry;
@@ -22,9 +25,11 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
   @override
   void initState() {
     super.initState();
+
     setState(() {
       itemData = widget.entry;
     });
+
     _loadTasks();
   }
 
@@ -40,6 +45,17 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
       );
       if (found.isNotEmpty) {
         itemData = Map<String, dynamic>.from(found.first);
+        final createdAt = DateFormat(
+          'dd/MM/yyyy',
+        ).format(DateTime.parse(widget.entry["taskCreatedAt"]));
+
+        final createTime = DateFormat(
+          'HH:mm a',
+        ).format(DateTime.parse(widget.entry["taskCreatedAt"]));
+
+        if (itemData["taskCreatedAt"] != null) {
+          itemData["taskCreatedAt"] = "$createdAt $createTime";
+        }
       }
     });
   }
@@ -52,7 +68,7 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
 
   @override
   Widget build(BuildContext context) {
-    String tappedId = Provider.of<TaskNotifier>(context).getSelectedTaskId();
+    final appTheme = Provider.of<ThemeNotifier>(context).getTheme();
 
     return Scaffold(
       body: SafeArea(
@@ -60,7 +76,7 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
         child: SingleChildScrollView(
           child: Container(
             padding: EdgeInsets.only(bottom: 60),
-            decoration: BoxDecoration(color: const Color(0xFFF5F3EE)),
+            decoration: BoxDecoration(color: TColors.background(appTheme)),
             child: Column(
               spacing: 15,
               children: [
@@ -72,14 +88,20 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                       onPressed: () {
                         Navigator.pop(context, true);
                       },
-                      style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                      style: TButtonTheme.transparentTextButton(appTheme)
+                          .copyWith(
+                            padding: WidgetStateProperty.all(EdgeInsets.all(0)),
+                          ),
                       child: Row(
                         children: [
-                          Icon(Icons.arrow_back, color: Color(0xFF2C2C2A)),
+                          Icon(
+                            Icons.arrow_back,
+                            color: TColors.primary(appTheme),
+                          ),
                           Text(
                             'Back',
                             style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(color: Color(0xFF2C2C2A)),
+                                ?.copyWith(color: TColors.primary(appTheme)),
                           ),
                         ],
                       ),
@@ -107,12 +129,12 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                             icon: Icon(Icons.edit, size: 20),
                             constraints: BoxConstraints(),
                             style: IconButton.styleFrom(
-                              backgroundColor: Colors.white,
+                              backgroundColor: TColors.white(appTheme),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              side: const BorderSide(
-                                color: Color(0xFFD3D1C7),
+                              side: BorderSide(
+                                color: TColors.border(appTheme),
                                 width: 1,
                               ),
                             ),
@@ -149,12 +171,12 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                           icon: Icon(Icons.delete, color: Colors.red, size: 20),
                           constraints: BoxConstraints(),
                           style: IconButton.styleFrom(
-                            backgroundColor: Colors.white,
+                            backgroundColor: TColors.white(appTheme),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            side: const BorderSide(
-                              color: Color(0xFFD3D1C7),
+                            side: BorderSide(
+                              color: TColors.border(appTheme),
                               width: 1,
                             ),
                           ),
@@ -172,14 +194,14 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                       width: double.infinity,
                       padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Color(0xFF0EAF3DE),
+                        color: TColors.green200,
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Column(
                         children: [
                           Icon(
                             Icons.check_circle_outline,
-                            color: Color(0xFF3B6D11),
+                            color: TColors.success,
                             size: 40,
                           ),
                           Text(
@@ -212,11 +234,7 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                   isLargeView: true,
                   priority: itemData["taskPriority"] ?? "",
                   onTap: (id) {
-                    // setState(() {
-                    //   tappedId = id;
-                    // });
                     context.read<TaskNotifier>().setSelectedTaskId(id);
-                    // Provider.of<TaskNotifier>(context).setSelectedTaskId(id);
                   },
                 ),
 
@@ -224,9 +242,9 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                   padding: EdgeInsets.only(top: 0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: TColors.white(appTheme),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Color(0xFFD3D1C7)),
+                      border: Border.all(color: TColors.border(appTheme)),
                     ),
                     child: Padding(
                       padding: EdgeInsets.all(14),
@@ -237,7 +255,7 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                             children: [
                               Icon(
                                 Icons.calendar_month_outlined,
-                                color: Color(0xFF2C2C2A),
+                                color: TColors.primary(appTheme),
                                 size: 20,
                               ),
                               SizedBox(width: 15),
@@ -269,9 +287,9 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                   padding: EdgeInsets.only(top: 0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: TColors.white(appTheme),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Color(0xFFD3D1C7)),
+                      border: Border.all(color: TColors.border(appTheme)),
                     ),
                     child: Padding(
                       padding: EdgeInsets.all(14),
@@ -282,7 +300,7 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                             children: [
                               Icon(
                                 Icons.folder_outlined,
-                                color: Color(0xFF2C2C2A),
+                                color: TColors.primary(appTheme),
                                 size: 20,
                               ),
                               SizedBox(width: 15),
@@ -310,9 +328,9 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                     padding: EdgeInsets.only(top: 0),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: TColors.white(appTheme),
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Color(0xFFD3D1C7)),
+                        border: Border.all(color: TColors.border(appTheme)),
                       ),
                       child: Padding(
                         padding: EdgeInsets.all(14),
@@ -323,7 +341,7 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                               children: [
                                 Icon(
                                   Icons.access_time_outlined,
-                                  color: Color(0xFF2C2C2A),
+                                  color: TColors.primary(appTheme),
                                   size: 20,
                                 ),
                                 SizedBox(width: 15),
@@ -342,9 +360,9 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                   padding: EdgeInsets.only(top: 0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: TColors.white(appTheme),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Color(0xFFD3D1C7)),
+                      border: Border.all(color: TColors.border(appTheme)),
                     ),
                     child: Padding(
                       padding: EdgeInsets.all(14),
@@ -356,7 +374,7 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                             children: [
                               Icon(
                                 Icons.note_add_outlined,
-                                color: Color(0xFF2C2C2A),
+                                color: TColors.primary(appTheme),
                                 size: 20,
                               ),
                               SizedBox(width: 15),
@@ -385,7 +403,7 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                     padding: EdgeInsets.symmetric(vertical: 10),
                     child: SizedBox(
                       width: double.infinity,
-                      child: FloatingActionButton(
+                      child: ElevatedButton(
                         onPressed: () async {
                           final updatedEntry = {
                             ...itemData,
@@ -397,16 +415,15 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                           _loadTasks();
                           // Navigator.pop(context);
                         },
-                        backgroundColor: Colors.black,
+                        style: TButtonTheme.primaryElevatedButton(appTheme),
                         child: SizedBox(
-                          // width: double.infinity,
                           child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 10),
+                            padding: EdgeInsets.symmetric(vertical: 16),
                             child: Center(
                               child: Text(
                                 "Mark as done",
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: TColors.white(appTheme),
                                   fontSize: 16,
                                 ),
                               ),

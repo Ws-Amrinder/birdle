@@ -1,7 +1,10 @@
 import 'dart:async';
 
+import 'package:birdle/providers/themeProvider.dart';
 import 'package:birdle/screens/home.dart';
+import 'package:birdle/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -25,6 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Provider.of<ThemeNotifier>(context).getTheme();
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -38,7 +42,10 @@ class _SplashScreenState extends State<SplashScreen> {
                 Text('Taches', style: TextStyle(fontSize: 44)),
                 Text(
                   'Stay on top of it.',
-                  style: TextStyle(fontSize: 24, color: Colors.grey),
+                  style: TextStyle(
+                    fontSize: 24,
+                    color: TColors.textSecondary(appTheme),
+                  ),
                 ),
               ],
             ),

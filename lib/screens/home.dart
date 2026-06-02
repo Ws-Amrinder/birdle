@@ -1,12 +1,17 @@
+import 'package:birdle/providers/themeProvider.dart';
+import 'package:birdle/storage/theme_storage.dart';
+import 'package:birdle/utils/constants/colors.dart';
+import 'package:birdle/utils/theme/customThemes/buttonTheme.dart';
 import 'package:flutter/material.dart';
 import 'package:birdle/components/addTaskDrawer.dart';
 import 'package:birdle/components/tagCard.dart';
 import 'package:birdle/components/taskcard.dart';
 import 'package:birdle/components/taskItem.dart';
-import 'package:birdle/task_storage.dart';
+import 'package:birdle/storage/task_storage.dart';
 import 'package:birdle/screens/viewItem.dart';
 import 'package:provider/provider.dart';
 import 'package:birdle/providers/taskProvider.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -26,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int completedTasksToday = 0;
 
   DateTime now = DateTime.now();
+  String formattedDate = DateFormat('dd MMM yyyy').format(DateTime.now());
 
   @override
   void initState() {
@@ -56,10 +62,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final completedTasks = todayTasks.first!["tasks"]!
         .where((element) => element["status"] == "done")
         .length;
-
-    print(
-      "---------------------------------totalTasksToday: ${totalTasksToday}, completedTasksToday: ${completedTasksToday}---------------------------------",
-    );
 
     if (selectedTagId == "done") {
       filteredTasks = value
@@ -111,6 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Calculate one-third of the screen width
     double myWidth = screenWidth / 3 - 20;
     String tappedId = Provider.of<TaskNotifier>(context).getSelectedTaskId();
+    final appTheme = Provider.of<ThemeNotifier>(context).getTheme();
 
     return Scaffold(
       key: _scaffoldKey,
@@ -118,308 +121,320 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         minimum: EdgeInsets.only(left: 20, right: 20, top: 60, bottom: 30),
         child: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Container(
-              padding: EdgeInsets.only(bottom: 60),
-              decoration: BoxDecoration(color: const Color(0xFFF5F3EE)),
-              child: Padding(
-                padding: EdgeInsets.all(0),
-                child: Column(
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text('My Tasks', style: Theme.of(context).textTheme.headlineLarge),
-                    ),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        '19 May 2026',
-                        style: Theme.of(context).textTheme?.bodyMedium,
-                      ),
-                    ),
-
-                    // task cards
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      child: Row(
+          children: [
+            SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.only(bottom: 60),
+                // decoration: BoxDecoration(color: TColors.background(appTheme)),
+                child: Padding(
+                  padding: EdgeInsets.all(0),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          TaskCard(
-                            title: totalTasksToday.toString(),
-                            description: 'Total',
-                            myWidth: myWidth,
-                          ),
-                          Spacer(),
-                          TaskCard(
-                            title: completedTasksToday.toString(),
-                            description: 'Done',
-                            myWidth: myWidth,
-                          ),
-                          Spacer(),
-                          TaskCard(
-                            title: (totalTasksToday - completedTasksToday)
-                                .toString(),
-                            description: 'Left',
-                            myWidth: myWidth,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // progress labels
-                    Row(
-                      children: [
-                        Text(
-                          "Today's Progress",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Color(0xFF888780),
-                          ),
-                        ),
-                        Spacer(),
-                        Text(
-                          progressToday.toStringAsFixed(0) + '%',
-
-                          // completedTasksPercentage,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Color(0xFF888780),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    // progress bar
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          final progressFraction = (progressToday / 100).clamp(
-                            0.0,
-                            1.0,
-                          );
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: const Color.fromARGB(148, 211, 209, 199),
-                              borderRadius: BorderRadius.circular(10),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'My Tasks',
+                              style: Theme.of(context).textTheme.headlineLarge,
                             ),
-                            height: 10,
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF000000),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                width: constraints.maxWidth * progressFraction,
-                                height: 10,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-
-                    // tags
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Wrap(
-                              children: [
-                                TagCard(
-                                  tag: "All",
-                                  id: "all",
-                                  selectedTagId: selectedTagId,
-                                  onTagPressed: (id) {
-                                    setState(() {
-                                      selectedTagId = id;
-                                    });
-                                    _loadTasks();
-                                  },
-                                ),
-
-                                TagCard(
-                                  tag: "Active",
-                                  id: "active",
-                                  selectedTagId: selectedTagId,
-                                  onTagPressed: (id) {
-                                    setState(() {
-                                      selectedTagId = id;
-                                    });
-                                    _loadTasks();
-                                  },
-                                ),
-
-                                TagCard(
-                                  tag: "Done",
-                                  id: "done",
-                                  selectedTagId: selectedTagId,
-                                  onTagPressed: (id) {
-                                    setState(() {
-                                      selectedTagId = id;
-                                    });
-                                    _loadTasks();
-                                  },
-                                ),
-                              ],
+                          ),
+                          IconButton(
+                            onPressed: () async {
+                              isDarkMode().then((value) {
+                                if (value) {
+                                  setTheme('light');
+                                  context.read<ThemeNotifier>().setTheme(
+                                    'light',
+                                  );
+                                } else {
+                                  setTheme('dark');
+                                  context.read<ThemeNotifier>().setTheme(
+                                    'dark',
+                                  );
+                                }
+                              });
+                            },
+                            icon: Icon(
+                              appTheme == 'dark'
+                                  ? Icons.light_mode
+                                  : Icons.dark_mode,
                             ),
                           ),
                         ],
                       ),
-                    ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          formattedDate,
+                          style: Theme.of(context).textTheme?.bodyMedium,
+                        ),
+                      ),
 
-                    if (tasksList.isEmpty || tasksList.first["tasks"]!.isEmpty)
+                      // task cards
                       Padding(
-                        padding: EdgeInsets.only(top: 100),
-                        child: Column(
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        child: Row(
                           children: [
-                            Text(
-                              "All caught up!",
-                              style: TextStyle(fontSize: 18),
+                            TaskCard(
+                              title: totalTasksToday.toString(),
+                              description: 'Total',
+                              myWidth: myWidth,
                             ),
-                            Text(
-                              "No completed tasks yet. \n Start checking things off.",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Color(0xFF888780),
+                            Spacer(),
+                            TaskCard(
+                              title: completedTasksToday.toString(),
+                              description: 'Done',
+                              myWidth: myWidth,
+                            ),
+                            Spacer(),
+                            TaskCard(
+                              title: (totalTasksToday - completedTasksToday)
+                                  .toString(),
+                              description: 'Left',
+                              myWidth: myWidth,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // progress labels
+                      Row(
+                        children: [
+                          Text(
+                            "Today's Progress",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: TColors.textSecondary(appTheme),
+                            ),
+                          ),
+                          Spacer(),
+                          Text(
+                            progressToday.toStringAsFixed(0) + '%',
+
+                            // completedTasksPercentage,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: TColors.textSecondary(appTheme),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      // progress bar
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final progressFraction = (progressToday / 100)
+                                .clamp(0.0, 1.0);
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(148, 211, 209, 199),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              height: 10,
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: TColors.primary(appTheme),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  width:
+                                      constraints.maxWidth * progressFraction,
+                                  height: 10,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+
+                      // tags
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Wrap(
+                                children: [
+                                  TagCard(
+                                    tag: "All",
+                                    id: "all",
+                                    selectedTagId: selectedTagId,
+                                    onTagPressed: (id) {
+                                      setState(() {
+                                        selectedTagId = id;
+                                      });
+                                      _loadTasks();
+                                    },
+                                  ),
+
+                                  TagCard(
+                                    tag: "Active",
+                                    id: "active",
+                                    selectedTagId: selectedTagId,
+                                    onTagPressed: (id) {
+                                      setState(() {
+                                        selectedTagId = id;
+                                      });
+                                      _loadTasks();
+                                    },
+                                  ),
+
+                                  TagCard(
+                                    tag: "Done",
+                                    id: "done",
+                                    selectedTagId: selectedTagId,
+                                    onTagPressed: (id) {
+                                      setState(() {
+                                        selectedTagId = id;
+                                      });
+                                      _loadTasks();
+                                    },
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                      )
-                    else
-                      for (var entry in tasksList)
-                        if (entry["tasks"].isNotEmpty)
-                          Padding(
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                            child: Column(
-                              spacing: 0,
-                              children: [
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Padding(
-                                    padding: EdgeInsets.only(bottom: 10),
-                                    child: Text(
-                                      entry["taskDate"] ?? "",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Color(0xFF888780),
+                      ),
+
+                      if (tasksList.isEmpty ||
+                          tasksList.first["tasks"]!.isEmpty)
+                        Padding(
+                          padding: EdgeInsets.only(top: 100),
+                          child: Column(
+                            children: [
+                              Text(
+                                "All caught up!",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              Text(
+                                "No completed tasks yet. \n Start checking things off.",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: TColors.textSecondary(appTheme),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        for (var entry in tasksList)
+                          if (entry["tasks"].isNotEmpty)
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              child: Column(
+                                spacing: 0,
+                                children: [
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(bottom: 10),
+                                      child: Text(
+                                        entry["taskDate"] ?? "",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: TColors.textSecondary(
+                                            appTheme,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
 
-                                for (var taskEntry in entry["tasks"] as List)
-                                  TaskItem(
-                                    title: taskEntry["taskName"] ?? "",
-                                    category: taskEntry["taskCategory"] ?? "",
-                                    description:
-                                        taskEntry["taskDescription"] ?? "",
-                                    id: taskEntry["taskId"] ?? "",
-                                    tappedId: tappedId,
-                                    date: taskEntry["taskDate"] ?? "",
-                                    time: taskEntry["taskTime"] ?? "",
-                                    priority: taskEntry["taskPriority"] ?? "",
-                                    status: taskEntry["status"] ?? "",
-                                    onTap: (id) {
-                                      context
-                                          .read<TaskNotifier>()
-                                          .setSelectedTaskId(id);
-                                      context
-                                          .read<TaskNotifier>()
-                                          .setSelectedCategoryId(
-                                            taskEntry["taskCategory"] ?? "",
-                                          );
-                                      context
-                                          .read<TaskNotifier>()
-                                          .setSelectedPriorityId(
-                                            taskEntry["taskPriority"] ?? "",
-                                          );
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ViewUpdateItem(
-                                            entry: taskEntry,
-                                            taskDate: entry["taskDate"] ?? "",
+                                  for (var taskEntry in entry["tasks"] as List)
+                                    TaskItem(
+                                      title: taskEntry["taskName"] ?? "",
+                                      category: taskEntry["taskCategory"] ?? "",
+                                      description:
+                                          taskEntry["taskDescription"] ?? "",
+                                      id: taskEntry["taskId"] ?? "",
+                                      tappedId: tappedId,
+                                      date: taskEntry["taskDate"] ?? "",
+                                      time: taskEntry["taskTime"] ?? "",
+                                      priority: taskEntry["taskPriority"] ?? "",
+                                      status: taskEntry["status"] ?? "",
+                                      onTap: (id) {
+                                        context
+                                            .read<TaskNotifier>()
+                                            .setSelectedTaskId(id);
+                                        context
+                                            .read<TaskNotifier>()
+                                            .setSelectedCategoryId(
+                                              taskEntry["taskCategory"] ?? "",
+                                            );
+                                        context
+                                            .read<TaskNotifier>()
+                                            .setSelectedPriorityId(
+                                              taskEntry["taskPriority"] ?? "",
+                                            );
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ViewUpdateItem(
+                                                  entry: taskEntry,
+                                                  taskDate:
+                                                      entry["taskDate"] ?? "",
+                                                ),
                                           ),
-                                        ),
-                                      ).then((value) {
-                                        _loadTasks();
-                                        context
-                                            .read<TaskNotifier>()
-                                            .resetSelectedTaskId();
-                                        context
-                                            .read<TaskNotifier>()
-                                            .resetSelectedCategoryId();
-                                        context
-                                            .read<TaskNotifier>()
-                                            .resetSelectedPriorityId();
-                                      });
-                                    },
-                                  ),
-                              ],
+                                        ).then((value) {
+                                          _loadTasks();
+                                          context
+                                              .read<TaskNotifier>()
+                                              .resetSelectedTaskId();
+                                          context
+                                              .read<TaskNotifier>()
+                                              .resetSelectedCategoryId();
+                                          context
+                                              .read<TaskNotifier>()
+                                              .resetSelectedPriorityId();
+                                        });
+                                      },
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-
-                    // ElevatedButton(
-                    //   style: ButtonStyle(
-                    //     backgroundColor: WidgetStateProperty.all(Colors.black),
-                    //     shape: WidgetStateProperty.all(CircleBorder()),
-                    //   ),
-                    //   onPressed: () async {
-                    //     await showModalBottomSheet<void>(
-                    //       context: context,
-                    //       isScrollControlled: true,
-                    //       builder: (BuildContext context) {
-                    //         return AddTaskDrawer();
-                    //       },
-                    //       backgroundColor: const Color(0xFFF5F3EE),
-                    //     );
-                    //     _loadTasks();
-                    //   },
-                    //   child: Icon(
-                    //     Icons.add,
-                    //     color: Colors.white,
-                    //     size: 24.0,
-                    //     semanticLabel:
-                    //         'Text to announce in accessibility modes',
-                    //   ),
-                    // ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          Align(alignment: Alignment.bottomCenter, child: Padding(padding: EdgeInsets.only(bottom: 0), child: 
-          ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(Colors.black),
-              shape: WidgetStateProperty.all(CircleBorder()),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 0),
+                child: ElevatedButton(
+                  style: TButtonTheme.primaryElevatedButton(
+                    appTheme,
+                  ).copyWith(shape: WidgetStateProperty.all(CircleBorder())),
+                  onPressed: () async {
+                    await showModalBottomSheet<void>(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (BuildContext context) {
+                        return AddTaskDrawer();
+                      },
+                      backgroundColor: TColors.background(appTheme),
+                    );
+                    _loadTasks();
+                  },
+                  child: Icon(
+                    Icons.add,
+                    color: TColors.white(appTheme),
+                    size: 24.0,
+                    semanticLabel: 'Text to announce in accessibility modes',
+                  ),
+                ),
+              ),
             ),
-            onPressed: () async {
-              await showModalBottomSheet<void>(
-                context: context,
-                isScrollControlled: true,
-                builder: (BuildContext context) {
-                  return AddTaskDrawer();
-                },
-                backgroundColor: const Color(0xFFF5F3EE),
-              );
-              _loadTasks();
-            },
-            child: Icon(
-              Icons.add,
-              color: Colors.white,
-              size: 24.0,
-              semanticLabel: 'Text to announce in accessibility modes',
-            ),
-          ),
-          ),
-          ),
-        ],
-      )),
+          ],
+        ),
+      ),
     );
   }
 }

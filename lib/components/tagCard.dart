@@ -1,4 +1,7 @@
+import 'package:birdle/providers/themeProvider.dart';
+import 'package:birdle/utils/theme/customThemes/buttonTheme.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class TagCard extends StatelessWidget {
   final String tag;
@@ -24,12 +27,16 @@ class TagCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Provider.of<ThemeNotifier>(context).getTheme();
+
     return TextButton(
       key: Key(id),
       onPressed: () {
         onTagPressed?.call(id);
       },
-      style: TextButton.styleFrom(padding: EdgeInsets.symmetric(horizontal: 6)),
+      style: TButtonTheme.transparentTextButton(appTheme).copyWith(
+        padding: WidgetStateProperty.all(EdgeInsets.symmetric(horizontal: 6)),
+      ),
       child: Container(
         key: UniqueKey(),
         decoration: BoxDecoration(
@@ -47,7 +54,6 @@ class TagCard extends StatelessWidget {
                 : Color(0xFF888780),
           ),
         ),
-        // alignment: Alignment.centerLeft,
         padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         child: Text(
           tag,

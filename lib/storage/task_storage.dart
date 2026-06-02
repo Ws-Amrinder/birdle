@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:birdle/providers/taskProvider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 Future<List<Map<String, dynamic>>> getTasks() async {
   final prefs = await SharedPreferencesAsync();
@@ -10,10 +10,9 @@ Future<List<Map<String, dynamic>>> getTasks() async {
 
   final decoded = jsonDecode(taskJson);
   if (decoded is List) {
-    return decoded.map((e) => Map<String, dynamic>.from(e as Map)).toList();
-  }
-  if (decoded is Map) {
-    return [Map<String, dynamic>.from(decoded)];
+    final newList = decoded.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+    newList.sort((a, b) => b['taskDate'].compareTo(a['taskDate']));
+    return newList;
   }
   return [];
 }
@@ -33,10 +32,6 @@ Future<bool> saveTask(Map<String, String> task) async {
 
     final tasksWithSameDate = existing.where(
       (e) => (e['taskDate'] as String?) == dayKey,
-    );
-
-    print(
-      "-------------------------------tasksWithSameDate: ${tasksWithSameDate} -------------------------------",
     );
 
     if (tasksWithSameDate.isNotEmpty) {
@@ -74,7 +69,6 @@ Future<bool> updateTask(Map<String, dynamic> task, String taskDate) async {
 Future<bool> deleteTask(String taskId, String taskDate) async {
   final prefs = await SharedPreferencesAsync();
   final existing = await getTasks();
-  print("exist-------------------------- ${existing}");
   final tasksWithSameDate = existing.where((element) => element["taskDate"] == taskDate);
   tasksWithSameDate.first["tasks"].removeWhere((element) => element['taskId'] == taskId);
 

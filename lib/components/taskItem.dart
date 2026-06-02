@@ -1,7 +1,10 @@
+import 'package:birdle/providers/themeProvider.dart';
+import 'package:birdle/utils/constants/colors.dart';
 import 'package:birdle/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:birdle/components/addTaskDrawer.dart';
 import 'package:birdle/components/helpers/tasks.dart';
+import 'package:provider/provider.dart';
 
 class TaskItem extends StatelessWidget {
   final String title;
@@ -34,7 +37,9 @@ class TaskItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color clr = Colors.red;
+    final appTheme = Provider.of<ThemeNotifier>(context).getTheme();
+
+    Color clr = TColors.danger;
     HSLColor hsl = HSLColor.fromColor(clr);
     double newLightness = (hsl.lightness + 0.3).clamp(0.0, 1.2);
     Color newColor = hsl.withLightness(newLightness).toColor();
@@ -43,16 +48,15 @@ class TaskItem extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: 5),
       child: GestureDetector(
         onTap: () {
-          print("TaskItem tapped");
           onTap(id);
         },
         child: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFFD85A30),
+            color: TColors.danger,
             borderRadius: BorderRadius.circular(10),
             border: Border(
               left: tappedId == id
-                  ? BorderSide(color: const Color(0xFFD85A30))
+                  ? BorderSide(color: TColors.danger)
                   : BorderSide.none,
             ),
           ),
@@ -63,10 +67,9 @@ class TaskItem extends StatelessWidget {
                 : EdgeInsets.only(left: 0),
             child: Container(
               decoration: BoxDecoration(
-                // color: const Color(0xFFF5F3EE),
-                color: Colors.white,
+                color: TColors.white(appTheme),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFD3D1C7)),
+                border: Border.all(color: TColors.border(appTheme)),
               ),
 
               // height: 10,
@@ -80,7 +83,9 @@ class TaskItem extends StatelessWidget {
                           tappedId == id || status == "done"
                               ? Icons.check_circle
                               : Icons.circle_outlined,
-                          color: tappedId == id ? Colors.green : Colors.grey,
+                          color: tappedId == id
+                              ? TColors.success
+                              : TColors.grey,
                           size: isLargeView ? 34 : 30,
                         ),
                         SizedBox(width: 10),
@@ -92,12 +97,14 @@ class TaskItem extends StatelessWidget {
                               style: Theme.of(context).textTheme.headlineMedium
                                   ?.copyWith(
                                     color: status == "done"
-                                        ? Color(0xFF888780)
-                                        : Colors.black,
+                                        ? TColors.textSecondary(appTheme)
+                                        : TColors.text(appTheme),
                                     decoration: status == "done"
                                         ? TextDecoration.lineThrough
                                         : TextDecoration.none,
-                                    decorationColor: Color(0xFF888780),
+                                    decorationColor: TColors.textSecondary(
+                                      appTheme,
+                                    ),
                                   ),
                             ),
 
@@ -148,7 +155,10 @@ class TaskItem extends StatelessWidget {
                                 Container(
                                   decoration: BoxDecoration(
                                     color: HSLColor.fromColor(
-                                      TaskHelper.getPriorityColor(priority),
+                                      TaskHelper.getPriorityColor(
+                                        priority,
+                                        appTheme,
+                                      ),
                                     ).withLightness(0.9).toColor(),
                                     borderRadius: BorderRadius.circular(10),
                                   ),

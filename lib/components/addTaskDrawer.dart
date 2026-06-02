@@ -1,11 +1,14 @@
 import 'package:birdle/components/commons/datePicker.dart';
-import 'package:birdle/utils/theme/theme.dart';
+import 'package:birdle/providers/themeProvider.dart';
+import 'package:birdle/storage/task_storage.dart';
+import 'package:birdle/utils/constants/colors.dart';
+import 'package:birdle/utils/theme/customThemes/buttonTheme.dart';
+import 'package:birdle/utils/theme/customThemes/inputTheme.dart';
 import 'package:birdle/components/commons/timePicker.dart';
 import 'package:birdle/providers/taskProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:birdle/components/tagCard.dart';
 import 'package:uuid/uuid.dart';
-import 'package:birdle/task_storage.dart';
 import 'package:provider/provider.dart';
 
 class Task {
@@ -59,9 +62,7 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
 
   submitForm(BuildContext context, Map<String, String> taskMap) async {
     if (formKey.currentState!.validate()) {
-      print('Form is valid');
       bool success = await saveTask(taskMap);
-      print("success add task response ----------------------: ${success} -----------------------------");
       if (success) {
         Navigator.pop(context);
         context.read<TaskNotifier>().resetSelectedTaskId();
@@ -74,6 +75,7 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
   @override
   Widget build(BuildContext context) {
     // final String uniqueId = uuid.v4();
+    final appTheme = Provider.of<ThemeNotifier>(context).getTheme();
     final taskNameVal = taskNameController.text;
     final taskDescVal = taskDescriptionController.text;
     final taskDateVal = taskDateController.text;
@@ -111,7 +113,10 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 10),
-                  child: Text('Add Task', style: Theme.of(context).textTheme.headlineLarge),
+                  child: Text(
+                    'Add Task',
+                    style: Theme.of(context).textTheme.headlineLarge,
+                  ),
                 ),
 
                 Padding(
@@ -129,7 +134,7 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                           return null;
                         },
                         controller: taskNameController,
-                        decoration: TAppTheme.fieldDecoration(
+                        decoration: TInputTheme.fieldDecoration(
                           hintText: 'Enter Task Name',
                         ),
                       ),
@@ -153,7 +158,7 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
 
                         maxLines: 4,
                         controller: taskDescriptionController,
-                        decoration: TAppTheme.fieldDecoration(
+                        decoration: TInputTheme.fieldDecoration(
                           hintText: 'Enter Task Description',
                         ),
                       ),
@@ -268,7 +273,7 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                               children: [
                                 TagCard(
                                   tag: "Low",
-                                  color: Color(0xFF3B6D11),
+                                  color: TColors.success,
                                   id: "low",
                                   selectedTagId: context
                                       .read<TaskNotifier>()
@@ -281,12 +286,7 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                                 ),
                                 TagCard(
                                   tag: "Medium",
-                                  color: const Color.fromARGB(
-                                    255,
-                                    238,
-                                    165,
-                                    56,
-                                  ),
+                                  color: TColors.warning,
                                   id: "medium",
                                   selectedTagId: context
                                       .read<TaskNotifier>()
@@ -299,7 +299,7 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                                 ),
                                 TagCard(
                                   tag: "High",
-                                  color: Colors.red,
+                                  color: TColors.danger,
                                   id: "high",
                                   selectedTagId: context
                                       .read<TaskNotifier>()
@@ -325,9 +325,7 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                     onPressed: () async {
                       submitForm(context, taskMap);
                     },
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(Colors.black),
-                    ),
+                    style: TButtonTheme.primaryTextButton(appTheme),
                     child: SizedBox(
                       width: double.infinity,
                       child: Padding(
@@ -335,7 +333,10 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                         child: Center(
                           child: Text(
                             "Add Task",
-                            style: TextStyle(color: Colors.white, fontSize: 16),
+                            style: TextStyle(
+                              color: TColors.white(appTheme),
+                              fontSize: 16,
+                            ),
                           ),
                         ),
                       ),
@@ -345,7 +346,8 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
               ],
             ),
           ),
-      )),
+        ),
+      ),
     );
   }
 }

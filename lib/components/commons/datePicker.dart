@@ -1,3 +1,4 @@
+import 'package:birdle/utils/theme/customThemes/inputTheme.dart';
 import 'package:birdle/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 
@@ -43,7 +44,6 @@ class _DatePickerState extends State<DatePicker> {
       // firstDate: DateTime(now.year - 5),
       firstDate: DateTime.now(),
       lastDate: DateTime(now.year + 5),
-
     );
 
     if (pickedDate == null) return;
@@ -61,7 +61,7 @@ class _DatePickerState extends State<DatePicker> {
       onTap: _selectDate,
       controller: widget.controller,
       validator: widget.validator,
-      decoration: TAppTheme.fieldDecoration(hintText: widget.hintText),
+      decoration: TInputTheme.fieldDecoration(hintText: widget.hintText),
     );
   }
 }

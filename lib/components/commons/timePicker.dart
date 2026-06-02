@@ -1,3 +1,4 @@
+import 'package:birdle/utils/theme/customThemes/inputTheme.dart';
 import 'package:birdle/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 
@@ -54,7 +55,7 @@ class _TimePickerState extends State<TimePicker> {
       readOnly: true,
       onTap: _pickTime,
       validator: widget.validator,
-      decoration: TAppTheme.fieldDecoration(hintText: widget.hintText),
+      decoration: TInputTheme.fieldDecoration(hintText: widget.hintText),
     );
   }
 }
