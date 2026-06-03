@@ -1,17 +1,16 @@
 import 'dart:async';
-
-import 'package:birdle/providers/themeProvider.dart';
 import 'package:birdle/screens/home.dart';
+import 'package:birdle/storage/theme_storage.dart';
 import 'package:birdle/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
@@ -28,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Provider.of<ThemeNotifier>(context).getTheme();
+    final appTheme = ref.watch(currentTheme).value ?? '';
     return Scaffold(
       body: SafeArea(
         child: Center(

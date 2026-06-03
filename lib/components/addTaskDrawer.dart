@@ -1,15 +1,15 @@
 import 'package:birdle/components/commons/datePicker.dart';
-import 'package:birdle/providers/themeProvider.dart';
+import 'package:birdle/providers/taskProvider.dart';
 import 'package:birdle/storage/task_storage.dart';
+import 'package:birdle/storage/theme_storage.dart';
 import 'package:birdle/utils/constants/colors.dart';
 import 'package:birdle/utils/theme/customThemes/buttonTheme.dart';
 import 'package:birdle/utils/theme/customThemes/inputTheme.dart';
 import 'package:birdle/components/commons/timePicker.dart';
-import 'package:birdle/providers/taskProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:birdle/components/tagCard.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
-import 'package:provider/provider.dart';
 
 class Task {
   final String taskName;
@@ -31,15 +31,12 @@ class Task {
   });
 }
 
-class AddTaskDrawer extends StatefulWidget {
+class AddTaskDrawer extends ConsumerStatefulWidget {
   @override
-  State<AddTaskDrawer> createState() => _AddTaskDrawerState();
+  ConsumerState<AddTaskDrawer> createState() => _AddTaskDrawerState();
 }
 
-class _AddTaskDrawerState extends State<AddTaskDrawer> {
-  String selectedCategoryId = "work";
-  String selectedPriorityId = "low";
-
+class _AddTaskDrawerState extends ConsumerState<AddTaskDrawer> {
   // final asyncPrefs = await SharedPreferencesAsync();
   List<String> savedTasks = [];
   final uuid = Uuid();
@@ -64,34 +61,32 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
     if (formKey.currentState!.validate()) {
       bool success = await saveTask(taskMap);
       if (success) {
+        ref.read(selectedTaskId.notifier).state = "";
+        ref.read(selectedCategoryId.notifier).state = "";
+        ref.read(selectedPriorityId.notifier).state = "";
         Navigator.pop(context);
-        context.read<TaskNotifier>().resetSelectedTaskId();
-        context.read<TaskNotifier>().resetSelectedCategoryId();
-        context.read<TaskNotifier>().resetSelectedPriorityId();
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // final String uniqueId = uuid.v4();
-    final appTheme = Provider.of<ThemeNotifier>(context).getTheme();
+    final appTheme = ref.watch(currentTheme).value ?? '';
     final taskNameVal = taskNameController.text;
     final taskDescVal = taskDescriptionController.text;
     final taskDateVal = taskDateController.text;
     final taskTimeVal = taskTimeController.text;
+
+    final categoryId = ref.watch(selectedCategoryId);
+    final priorityId = ref.watch(selectedPriorityId);
 
     dynamic taskMap = {
       "taskName": taskNameVal,
       "taskDescription": taskDescVal,
       "taskDate": taskDateVal,
       "taskTime": taskTimeVal,
-      "taskCategory": Provider.of<TaskNotifier>(
-        context,
-      ).getSelectedCategoryId(),
-      "taskPriority": Provider.of<TaskNotifier>(
-        context,
-      ).getSelectedPriorityId(),
+      "taskCategory": categoryId,
+      "taskPriority": priorityId,
       "taskId": uuid.v1(),
       "status": "active",
       "taskCreatedAt": DateTime.now().toIso8601String(),
@@ -219,37 +214,34 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                                   tag: "Work",
                                   id: "work",
 
-                                  selectedTagId: context
-                                      .read<TaskNotifier>()
-                                      .getSelectedCategoryId(),
+                                  selectedTagId: categoryId,
                                   onTagPressed: (id) {
-                                    context
-                                        .read<TaskNotifier>()
-                                        .setSelectedCategoryId(id);
+                                    ref
+                                            .read(selectedCategoryId.notifier)
+                                            .state =
+                                        id;
                                   },
                                 ),
                                 TagCard(
                                   tag: "Personal",
                                   id: "personal",
-                                  selectedTagId: context
-                                      .read<TaskNotifier>()
-                                      .getSelectedCategoryId(),
+                                  selectedTagId: categoryId,
                                   onTagPressed: (id) {
-                                    context
-                                        .read<TaskNotifier>()
-                                        .setSelectedCategoryId(id);
+                                    ref
+                                            .read(selectedCategoryId.notifier)
+                                            .state =
+                                        id;
                                   },
                                 ),
                                 TagCard(
                                   tag: "Health",
                                   id: "health",
-                                  selectedTagId: context
-                                      .read<TaskNotifier>()
-                                      .getSelectedCategoryId(),
+                                  selectedTagId: categoryId,
                                   onTagPressed: (id) {
-                                    context
-                                        .read<TaskNotifier>()
-                                        .setSelectedCategoryId(id);
+                                    ref
+                                            .read(selectedCategoryId.notifier)
+                                            .state =
+                                        id;
                                   },
                                 ),
                               ],
@@ -275,39 +267,36 @@ class _AddTaskDrawerState extends State<AddTaskDrawer> {
                                   tag: "Low",
                                   color: TColors.success,
                                   id: "low",
-                                  selectedTagId: context
-                                      .read<TaskNotifier>()
-                                      .getSelectedPriorityId(),
+                                  selectedTagId: priorityId,
                                   onTagPressed: (id) {
-                                    context
-                                        .read<TaskNotifier>()
-                                        .setSelectedPriorityId(id);
+                                    ref
+                                            .read(selectedPriorityId.notifier)
+                                            .state =
+                                        id;
                                   },
                                 ),
                                 TagCard(
                                   tag: "Medium",
                                   color: TColors.warning,
                                   id: "medium",
-                                  selectedTagId: context
-                                      .read<TaskNotifier>()
-                                      .getSelectedPriorityId(),
+                                  selectedTagId: priorityId,
                                   onTagPressed: (id) {
-                                    context
-                                        .read<TaskNotifier>()
-                                        .setSelectedPriorityId(id);
+                                    ref
+                                            .read(selectedPriorityId.notifier)
+                                            .state =
+                                        id;
                                   },
                                 ),
                                 TagCard(
                                   tag: "High",
                                   color: TColors.danger,
                                   id: "high",
-                                  selectedTagId: context
-                                      .read<TaskNotifier>()
-                                      .getSelectedPriorityId(),
+                                  selectedTagId: priorityId,
                                   onTagPressed: (id) {
-                                    context
-                                        .read<TaskNotifier>()
-                                        .setSelectedPriorityId(id);
+                                    ref
+                                            .read(selectedPriorityId.notifier)
+                                            .state =
+                                        id;
                                   },
                                 ),
                               ],

@@ -1,36 +1,26 @@
 import 'package:birdle/screens/splash.dart';
+import 'package:birdle/storage/theme_storage.dart';
 import 'package:birdle/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'providers/taskProvider.dart';
-import 'providers/themeProvider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
   // run app takes a widget and runs it. so MainApp is the root widget here.
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => TaskNotifier()),
-        ChangeNotifierProvider(create: (context) => ThemeNotifier()),
-      ],
-      child: const MainApp(),
-    ),
-  );
+      ProviderScope(child: MainApp()));
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends ConsumerWidget {
   const MainApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final themeNotifier = Provider.of<ThemeNotifier>(context);
-    final theme = themeNotifier.getTheme();
-    final themeMode = theme == 'light' ? ThemeMode.light : ThemeMode.dark;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = ref.watch(currentTheme).value ?? '';
 
     return MaterialApp(
       theme: TAppTheme.lightTheme,
       darkTheme: TAppTheme.darkTheme,
-      themeMode: themeMode,
+      themeMode: theme == 'light' ? ThemeMode.light : ThemeMode.dark,
       home: SplashScreen(),
     );
   }

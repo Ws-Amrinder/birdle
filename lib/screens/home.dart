@@ -1,4 +1,3 @@
-import 'package:birdle/providers/themeProvider.dart';
 import 'package:birdle/storage/theme_storage.dart';
 import 'package:birdle/utils/constants/colors.dart';
 import 'package:birdle/utils/theme/customThemes/buttonTheme.dart';
@@ -9,20 +8,18 @@ import 'package:birdle/components/taskcard.dart';
 import 'package:birdle/components/taskItem.dart';
 import 'package:birdle/storage/task_storage.dart';
 import 'package:birdle/screens/viewItem.dart';
-import 'package:provider/provider.dart';
 import 'package:birdle/providers/taskProvider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   @override
   _HomeScreenState createState() => new _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   String selectedTagId = "all";
-  String selectedCategoryId = "work";
-  String selectedPriorityId = "low";
   String tasks = "";
   double completedTasksPercentage = 0;
   List<Map<String, dynamic>> tasksList = [];
@@ -108,12 +105,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context,) {
     double screenWidth = MediaQuery.of(context).size.width;
     // Calculate one-third of the screen width
     double myWidth = screenWidth / 3 - 20;
-    String tappedId = Provider.of<TaskNotifier>(context).getSelectedTaskId();
-    final appTheme = Provider.of<ThemeNotifier>(context).getTheme();
+    final appTheme = ref.watch(currentTheme).value ?? '';
 
     return Scaffold(
       key: _scaffoldKey,
@@ -125,7 +121,6 @@ class _HomeScreenState extends State<HomeScreen> {
             SingleChildScrollView(
               child: Container(
                 padding: EdgeInsets.only(bottom: 60),
-                // decoration: BoxDecoration(color: TColors.background(appTheme)),
                 child: Padding(
                   padding: EdgeInsets.all(0),
                   child: Column(
@@ -144,15 +139,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             onPressed: () async {
                               isDarkMode().then((value) {
                                 if (value) {
-                                  setTheme('light');
-                                  context.read<ThemeNotifier>().setTheme(
-                                    'light',
-                                  );
+                                  ref.read(setCurrentTheme('light'));
+                                  ref.invalidate(currentTheme);
                                 } else {
-                                  setTheme('dark');
-                                  context.read<ThemeNotifier>().setTheme(
-                                    'dark',
-                                  );
+                                  ref.read(setCurrentTheme('dark'));
+                                  ref.invalidate(currentTheme);
                                 }
                               });
                             },
@@ -353,25 +344,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                       description:
                                           taskEntry["taskDescription"] ?? "",
                                       id: taskEntry["taskId"] ?? "",
-                                      tappedId: tappedId,
+                                      tappedId: ref.read(selectedTaskId.notifier).state,
                                       date: taskEntry["taskDate"] ?? "",
                                       time: taskEntry["taskTime"] ?? "",
                                       priority: taskEntry["taskPriority"] ?? "",
                                       status: taskEntry["status"] ?? "",
                                       onTap: (id) {
-                                        context
-                                            .read<TaskNotifier>()
-                                            .setSelectedTaskId(id);
-                                        context
-                                            .read<TaskNotifier>()
-                                            .setSelectedCategoryId(
-                                              taskEntry["taskCategory"] ?? "",
-                                            );
-                                        context
-                                            .read<TaskNotifier>()
-                                            .setSelectedPriorityId(
-                                              taskEntry["taskPriority"] ?? "",
-                                            );
+                                        ref.read(selectedTaskId.notifier).state = id;
+                                        ref.read(selectedCategoryId.notifier).state = taskEntry["taskCategory"] ?? "";
+                                        ref.read(selectedPriorityId.notifier).state = taskEntry["taskPriority"] ?? "";
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
@@ -384,15 +365,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ),
                                         ).then((value) {
                                           _loadTasks();
-                                          context
-                                              .read<TaskNotifier>()
-                                              .resetSelectedTaskId();
-                                          context
-                                              .read<TaskNotifier>()
-                                              .resetSelectedCategoryId();
-                                          context
-                                              .read<TaskNotifier>()
-                                              .resetSelectedPriorityId();
+                                          ref.read(selectedTaskId.notifier).state = "";
+                                          ref.read(selectedCategoryId.notifier).state = "";
+                                          ref.read(selectedPriorityId.notifier).state = "";
                                         });
                                       },
                                     ),

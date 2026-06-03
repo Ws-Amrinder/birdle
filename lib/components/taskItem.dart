@@ -1,12 +1,11 @@
-import 'package:birdle/providers/themeProvider.dart';
+import 'package:birdle/storage/theme_storage.dart';
 import 'package:birdle/utils/constants/colors.dart';
-import 'package:birdle/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:birdle/components/addTaskDrawer.dart';
 import 'package:birdle/components/helpers/tasks.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class TaskItem extends StatelessWidget {
+class TaskItem extends ConsumerWidget {
   final String title;
   final String description;
   final String id;
@@ -36,8 +35,8 @@ class TaskItem extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final appTheme = Provider.of<ThemeNotifier>(context).getTheme();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appTheme = ref.watch(currentTheme).value ?? '';
 
     Color clr = TColors.danger;
     HSLColor hsl = HSLColor.fromColor(clr);

@@ -1,25 +1,25 @@
 import 'package:birdle/components/commons/confirmDialog.dart';
-import 'package:birdle/providers/themeProvider.dart';
 import 'package:birdle/screens/updateItem.dart';
 import 'package:birdle/storage/task_storage.dart';
+import 'package:birdle/storage/theme_storage.dart';
 import 'package:birdle/utils/constants/colors.dart';
 import 'package:birdle/utils/theme/customThemes/buttonTheme.dart';
 import 'package:flutter/material.dart';
 import 'package:birdle/components/taskItem.dart';
 import 'package:birdle/providers/taskProvider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
-class ViewUpdateItem extends StatefulWidget {
+class ViewUpdateItem extends ConsumerStatefulWidget {
   final Map<String, dynamic> entry;
   final String taskDate;
   const ViewUpdateItem({required this.entry, required this.taskDate});
 
   @override
-  State<ViewUpdateItem> createState() => _ViewUpdateItemState();
+  ConsumerState<ViewUpdateItem> createState() => _ViewUpdateItemState();
 }
 
-class _ViewUpdateItemState extends State<ViewUpdateItem> {
+class _ViewUpdateItemState extends ConsumerState<ViewUpdateItem> {
   Map<String, dynamic> itemData = {};
 
   @override
@@ -68,8 +68,7 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Provider.of<ThemeNotifier>(context).getTheme();
-
+    final appTheme = ref.watch(currentTheme).value ?? '';
     return Scaffold(
       body: SafeArea(
         minimum: EdgeInsets.only(left: 20, right: 20, top: 60, bottom: 30),
@@ -114,6 +113,8 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                             onPressed: () {
                               // Navigator.pop(context);
                               // push to edit item screen
+                              ref.read(selectedCategoryId.notifier).state = itemData["taskCategory"] ?? "";
+                              ref.read(selectedPriorityId.notifier).state = itemData["taskPriority"] ?? "";
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -152,15 +153,10 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                                   widget.taskDate,
                                 );
                                 if (result) {
-                                  context
-                                      .read<TaskNotifier>()
-                                      .resetSelectedTaskId();
-                                  context
-                                      .read<TaskNotifier>()
-                                      .resetSelectedCategoryId();
-                                  context
-                                      .read<TaskNotifier>()
-                                      .resetSelectedPriorityId();
+                                  ref.read(selectedTaskId.notifier).state = "";
+                                  ref.read(selectedCategoryId.notifier).state = "";
+                                  ref.read(selectedPriorityId.notifier).state = "";
+
                                   _loadTasks();
                                   Navigator.pop(context);
                                 }
@@ -234,7 +230,7 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
                   isLargeView: true,
                   priority: itemData["taskPriority"] ?? "",
                   onTap: (id) {
-                    context.read<TaskNotifier>().setSelectedTaskId(id);
+                    ref.read(selectedTaskId.notifier).state = id;
                   },
                 ),
 
@@ -413,7 +409,6 @@ class _ViewUpdateItemState extends State<ViewUpdateItem> {
 
                           await updateTask(updatedEntry, widget.taskDate);
                           _loadTasks();
-                          // Navigator.pop(context);
                         },
                         style: TButtonTheme.primaryElevatedButton(appTheme),
                         child: SizedBox(

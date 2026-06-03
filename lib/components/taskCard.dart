@@ -1,9 +1,9 @@
-import 'package:birdle/providers/themeProvider.dart';
+import 'package:birdle/storage/theme_storage.dart';
 import 'package:birdle/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class TaskCard extends StatelessWidget {
+class TaskCard extends ConsumerWidget {
   final String title;
   final String description;
   final double myWidth;
@@ -15,8 +15,8 @@ class TaskCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final appTheme = Provider.of<ThemeNotifier>(context).getTheme();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appTheme = ref.watch(currentTheme).value ?? '';
 
     return Container(
       decoration: BoxDecoration(

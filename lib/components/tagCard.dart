@@ -1,9 +1,9 @@
-import 'package:birdle/providers/themeProvider.dart';
+import 'package:birdle/storage/theme_storage.dart';
 import 'package:birdle/utils/theme/customThemes/buttonTheme.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class TagCard extends StatelessWidget {
+class TagCard extends ConsumerWidget {
   final String tag;
   final Color? color;
   final Function()? onPressed;
@@ -26,9 +26,8 @@ class TagCard extends StatelessWidget {
   late Color newColor = hsl.withLightness(newLightness).toColor();
 
   @override
-  Widget build(BuildContext context) {
-    final appTheme = Provider.of<ThemeNotifier>(context).getTheme();
-
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appTheme = ref.watch(currentTheme).value ?? '';
     return TextButton(
       key: Key(id),
       onPressed: () {

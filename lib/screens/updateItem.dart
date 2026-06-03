@@ -1,5 +1,5 @@
-import 'package:birdle/providers/themeProvider.dart';
 import 'package:birdle/storage/task_storage.dart';
+import 'package:birdle/storage/theme_storage.dart';
 import 'package:birdle/utils/constants/colors.dart';
 import 'package:birdle/utils/theme/customThemes/buttonTheme.dart';
 import 'package:birdle/utils/theme/customThemes/inputTheme.dart';
@@ -8,18 +8,18 @@ import 'package:birdle/components/commons/timePicker.dart';
 import 'package:birdle/components/tagCard.dart';
 import 'package:flutter/material.dart';
 import 'package:birdle/providers/taskProvider.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class UpdateItem extends StatefulWidget {
+class UpdateItem extends ConsumerStatefulWidget {
   final Map<String, dynamic> entry;
   final String taskDate;
   const UpdateItem({required this.entry, required this.taskDate});
 
   @override
-  State<UpdateItem> createState() => _UpdateItemState();
+  ConsumerState<UpdateItem> createState() => _UpdateItemState();
 }
 
-class _UpdateItemState extends State<UpdateItem> {
+class _UpdateItemState extends ConsumerState<UpdateItem> {
   final updateNameController = TextEditingController(text: '');
   final updateDescriptionController = TextEditingController(text: '');
   final updateDateController = TextEditingController(text: '');
@@ -53,8 +53,8 @@ class _UpdateItemState extends State<UpdateItem> {
         "taskDescription": updateDescriptionController.text,
         "taskDate": updateDateController.text,
         "taskTime": updateTimeController.text,
-        "taskCategory": context.read<TaskNotifier>().getSelectedCategoryId(),
-        "taskPriority": context.read<TaskNotifier>().getSelectedPriorityId(),
+        "taskCategory": ref.watch(selectedCategoryId),
+        "taskPriority": ref.watch(selectedPriorityId),
       };
       await updateTask(updatedEntry, widget.taskDate);
       Navigator.pop(context, true);
@@ -63,8 +63,9 @@ class _UpdateItemState extends State<UpdateItem> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Provider.of<ThemeNotifier>(context).getTheme();
-
+    final appTheme = ref.watch(currentTheme).value ?? '';
+    final categoryId = ref.watch(selectedCategoryId);
+    final priorityId = ref.watch(selectedPriorityId);
     return Scaffold(
       body: SafeArea(
         minimum: EdgeInsets.only(left: 20, right: 20, top: 60, bottom: 30),
@@ -94,6 +95,8 @@ class _UpdateItemState extends State<UpdateItem> {
                         alignment: Alignment.centerLeft,
                         child: TextButton(
                           onPressed: () {
+                            ref.read(selectedCategoryId.notifier).state = "";
+                            ref.read(selectedPriorityId.notifier).state = "";
                             Navigator.pop(context);
                           },
                           style: TButtonTheme.transparentTextButton(appTheme)
@@ -217,40 +220,34 @@ class _UpdateItemState extends State<UpdateItem> {
                                   TagCard(
                                     tag: "Work",
                                     id: "work",
-                                    selectedTagId: context
-                                        .read<TaskNotifier>()
-                                        .getSelectedCategoryId(),
+                                    selectedTagId: categoryId,
                                     onTagPressed: (id) {
-                                      // setState(() {
-                                      //   selectedCategoryId = id;
-                                      // });
-                                      context
-                                          .read<TaskNotifier>()
-                                          .setSelectedCategoryId(id);
+                                      ref
+                                              .read(selectedCategoryId.notifier)
+                                              .state =
+                                          id;
                                     },
                                   ),
                                   TagCard(
                                     tag: "Personal",
                                     id: "personal",
-                                    selectedTagId: context
-                                        .read<TaskNotifier>()
-                                        .getSelectedCategoryId(),
+                                    selectedTagId: categoryId,
                                     onTagPressed: (id) {
-                                      context
-                                          .read<TaskNotifier>()
-                                          .setSelectedCategoryId(id);
+                                      ref
+                                              .read(selectedCategoryId.notifier)
+                                              .state =
+                                          id;
                                     },
                                   ),
                                   TagCard(
                                     tag: "Health",
                                     id: "health",
-                                    selectedTagId: context
-                                        .read<TaskNotifier>()
-                                        .getSelectedCategoryId(),
+                                    selectedTagId: categoryId,
                                     onTagPressed: (id) {
-                                      context
-                                          .read<TaskNotifier>()
-                                          .setSelectedCategoryId(id);
+                                      ref
+                                              .read(selectedCategoryId.notifier)
+                                              .state =
+                                          id;
                                     },
                                   ),
                                 ],
@@ -276,39 +273,36 @@ class _UpdateItemState extends State<UpdateItem> {
                                     tag: "Low",
                                     color: TColors.success,
                                     id: "low",
-                                    selectedTagId: context
-                                        .read<TaskNotifier>()
-                                        .getSelectedPriorityId(),
+                                    selectedTagId: priorityId,
                                     onTagPressed: (id) {
-                                      context
-                                          .read<TaskNotifier>()
-                                          .setSelectedPriorityId(id);
+                                      ref
+                                              .read(selectedPriorityId.notifier)
+                                              .state =
+                                          id;
                                     },
                                   ),
                                   TagCard(
                                     tag: "Medium",
                                     color: TColors.warning,
                                     id: "medium",
-                                    selectedTagId: context
-                                        .read<TaskNotifier>()
-                                        .getSelectedPriorityId(),
+                                    selectedTagId: priorityId,
                                     onTagPressed: (id) {
-                                      context
-                                          .read<TaskNotifier>()
-                                          .setSelectedPriorityId(id);
+                                      ref
+                                              .read(selectedPriorityId.notifier)
+                                              .state =
+                                          id;
                                     },
                                   ),
                                   TagCard(
                                     tag: "High",
                                     color: TColors.danger,
                                     id: "high",
-                                    selectedTagId: context
-                                        .read<TaskNotifier>()
-                                        .getSelectedPriorityId(),
+                                    selectedTagId: priorityId,
                                     onTagPressed: (id) {
-                                      context
-                                          .read<TaskNotifier>()
-                                          .setSelectedPriorityId(id);
+                                      ref
+                                              .read(selectedPriorityId.notifier)
+                                              .state =
+                                          id;
                                     },
                                   ),
                                 ],
