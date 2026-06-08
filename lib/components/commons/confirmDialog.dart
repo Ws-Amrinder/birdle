@@ -1,8 +1,9 @@
-import 'package:birdle/storage/theme_storage.dart';
+import 'package:birdle/bloc/theme/theme_bloc.dart';
+import 'package:birdle/bloc/theme/theme_state.dart';
 import 'package:birdle/utils/constants/colors.dart';
 import 'package:birdle/utils/theme/customThemes/buttonTheme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 Future<void> confirmDialog(
   BuildContext context,
@@ -17,9 +18,9 @@ Future<void> confirmDialog(
   return showDialog<void>(
     context: context,
     builder: (BuildContext context) {
-      return Consumer(
-        builder: (context, ref, child) {
-          final appTheme = ref.watch(currentTheme).value ?? '';
+      return BlocBuilder<ThemeBloc, ThemeState>(
+        builder: (context, themeState) {
+          final appTheme = themeState.theme;
           return AlertDialog(
             backgroundColor: TColors.background(appTheme),
             title: Text(title),

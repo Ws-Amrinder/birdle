@@ -1,12 +1,13 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final currentTheme = FutureProvider<String>((ref) async {
+Future<String> getTheme() async {
   final prefs = await SharedPreferencesAsync();
-  final theme = await prefs.getString('theme') ?? 'light';
+  return await prefs.getString('theme') ?? 'light';
+}
 
-  return theme;
+final currentTheme = FutureProvider<String>((ref) async {
+  return getTheme();
 });
 
 Future<bool> isDarkMode() async {

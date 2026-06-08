@@ -10,7 +10,9 @@ Future<List<Map<String, dynamic>>> getTasks() async {
 
   final decoded = jsonDecode(taskJson);
   if (decoded is List) {
-    final newList = decoded.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+    final newList = decoded
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
     newList.sort((a, b) => b['taskDate'].compareTo(a['taskDate']));
     return newList;
   }
@@ -35,7 +37,9 @@ Future<bool> saveTask(Map<String, String> task) async {
     );
 
     if (tasksWithSameDate.isNotEmpty) {
-      tasksWithSameDate.first["tasks"] = List.from(tasksWithSameDate.first["tasks"]);
+      tasksWithSameDate.first["tasks"] = List.from(
+        tasksWithSameDate.first["tasks"],
+      );
       tasksWithSameDate.first["tasks"].add(task);
       await prefs.setString('tasks', jsonEncode(existing));
       return true;
@@ -58,10 +62,14 @@ Future<bool> updateTask(Map<String, dynamic> task, String taskDate) async {
   final prefs = await SharedPreferencesAsync();
   final existing = await getTasks();
 
-  final tasksWithSameDate = existing.where((element) => element["taskDate"] == taskDate);
-  tasksWithSameDate.first["tasks"].removeWhere((element) => element['taskId'] == task['taskId']);
+  final tasksWithSameDate = existing.where(
+    (element) => element["taskDate"] == taskDate,
+  );
+  tasksWithSameDate.first["tasks"].removeWhere(
+    (element) => element['taskId'] == task['taskId'],
+  );
   tasksWithSameDate.first["tasks"].add(Map<String, dynamic>.from(task));
-  
+
   await prefs.setString('tasks', jsonEncode(existing));
   return true;
 }
@@ -69,8 +77,12 @@ Future<bool> updateTask(Map<String, dynamic> task, String taskDate) async {
 Future<bool> deleteTask(String taskId, String taskDate) async {
   final prefs = await SharedPreferencesAsync();
   final existing = await getTasks();
-  final tasksWithSameDate = existing.where((element) => element["taskDate"] == taskDate);
-  tasksWithSameDate.first["tasks"].removeWhere((element) => element['taskId'] == taskId);
+  final tasksWithSameDate = existing.where(
+    (element) => element["taskDate"] == taskDate,
+  );
+  tasksWithSameDate.first["tasks"].removeWhere(
+    (element) => element['taskId'] == taskId,
+  );
 
   if (tasksWithSameDate.first["tasks"].isEmpty) {
     existing.removeWhere((element) => element["taskDate"] == taskDate);

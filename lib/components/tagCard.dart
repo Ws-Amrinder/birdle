@@ -1,6 +1,8 @@
-import 'package:birdle/storage/theme_storage.dart';
+import 'package:birdle/bloc/theme/theme_bloc.dart';
+import 'package:birdle/bloc/theme/theme_state.dart';
 import 'package:birdle/utils/theme/customThemes/buttonTheme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class TagCard extends ConsumerWidget {
@@ -27,44 +29,50 @@ class TagCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final appTheme = ref.watch(currentTheme).value ?? '';
-    return TextButton(
-      key: Key(id),
-      onPressed: () {
-        onTagPressed?.call(id);
+    return BlocBuilder<ThemeBloc, ThemeState>(
+      builder: (context, themeState) {
+        final appTheme = themeState.theme;
+        return TextButton(
+          key: Key(id),
+          onPressed: () {
+            onTagPressed?.call(id);
+          },
+          style: TButtonTheme.transparentTextButton(appTheme).copyWith(
+            padding: WidgetStateProperty.all(
+              EdgeInsets.symmetric(horizontal: 6),
+            ),
+          ),
+          child: Container(
+            key: UniqueKey(),
+            decoration: BoxDecoration(
+              color: color != null
+                  ? newColor
+                  : selectedTagId == id
+                  ? color ?? Color(0xFF2C2C2A)
+                  : Color(0xFFFFFFFF),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: selectedTagId == id
+                    ? color ?? Color(0xFF2C2C2A)
+                    : color != null
+                    ? Colors.transparent
+                    : Color(0xFF888780),
+              ),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            child: Text(
+              tag,
+              style: TextStyle(
+                color: color != null
+                    ? color
+                    : selectedTagId == id
+                    ? Colors.white
+                    : Color(0xFF2C2C2A),
+              ),
+            ),
+          ),
+        );
       },
-      style: TButtonTheme.transparentTextButton(appTheme).copyWith(
-        padding: WidgetStateProperty.all(EdgeInsets.symmetric(horizontal: 6)),
-      ),
-      child: Container(
-        key: UniqueKey(),
-        decoration: BoxDecoration(
-          color: color != null
-              ? newColor
-              : selectedTagId == id
-              ? color ?? Color(0xFF2C2C2A)
-              : Color(0xFFFFFFFF),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: selectedTagId == id
-                ? color ?? Color(0xFF2C2C2A)
-                : color != null
-                ? Colors.transparent
-                : Color(0xFF888780),
-          ),
-        ),
-        padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-        child: Text(
-          tag,
-          style: TextStyle(
-            color: color != null
-                ? color
-                : selectedTagId == id
-                ? Colors.white
-                : Color(0xFF2C2C2A),
-          ),
-        ),
-      ),
     );
   }
 }
